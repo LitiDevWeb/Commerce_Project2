@@ -4,8 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User
-
+from .models import User, Category, Listing
 
 def index(request):
     return render(request, "auctions/index.html")
@@ -61,3 +60,47 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "auctions/register.html")
+    
+
+def createListing(request):
+    # In order to GET categories or retrieve data from database -> categories.objects.all
+    if request.method == "GET":
+        allCategories = Category.objects.all()
+        return render(request, "auctions/create.html", { 
+            "categories" : allCategories
+        })
+    # In order to POST  data to database -> 
+    else:
+        #Get the data from the form
+        title = request.POST["title"]
+        description = request.POST["description"]
+        imageurl = request.POST["imageurl"]
+        price = request.POST["price"]
+        category = request.POST["category"]  
+        #Who is the user
+        currentUser = request.user  
+
+        #Get all content about the particular category
+        categoryData = Category.objects.get(categoryName=category)
+
+        #Create a new listing object
+        newListing = Listing(
+            title=title,
+            description=description,
+            imageUrl=imageurl,
+            price=float(price),
+            category=categoryData,
+            owner=currentUser
+            )
+        #Insert the object in our database
+        newListing.save()
+        #Redirect to index page
+        return HttpResponseRedirect(reverse(index))
+
+
+    
+
+
+
+
+
