@@ -1,5 +1,5 @@
 {% extends "auctions/layout.html" %} {% block body %}
-<h2>Active Listings</h2>
+<h3>Active Listings</h3>
 <form action="{% url 'displayCategory' %}" method="POST" class="my-3">
   {% csrf_token %}
   <label for="category"
@@ -26,7 +26,9 @@
     <div class="card-body">
       <h5 class="card-title">{{ listing.title }}</h5>
       <p class="card-text">{{ listing.description }}</p>
-      <a href="#" class="btn btn-primary">Go somewhere</a>
+      <a href="{% url 'listing' id=listing.id  %}" class="btn btn-primary"
+        >Details</a
+      >
     </div>
   </div>
   {% endfor %}
