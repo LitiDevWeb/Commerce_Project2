@@ -4,15 +4,33 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User, Category, Listing
+from .models import User, Category, Listing, Comment, Bid
 
 def listing(request, id):
     listingData=Listing.objects.get(pk=id)
     isListingInWatchlist = request.user in listingData.watchlist.all()
+    allComments = Comment.objects.filter(listing=listingData)
     return render(request, "auctions/listing.html",{ 
         "listing" : listingData,
-        "isListingInWatchlist": isListingInWatchlist
+        "isListingInWatchlist": isListingInWatchlist,
+        "allComments":allComments
     })
+
+def addComment(request, id):
+    currentUser = request.user
+    listingData = Listing.objects.get(pk=id)
+    message = request.POST['newComment']
+
+    newComment = Comment(
+        author = currentUser,
+        listing = listingData,
+        message=message
+    )
+    newComment.save()
+
+    return HttpResponseRedirect(reverse("listing", args=(id, )))
+
+
 
 def displayWatchlist(request):
     currentUser = request.user
@@ -132,12 +150,17 @@ def createListing(request):
         #Get all content about the particular category
         categoryData = Category.objects.get(categoryName=category)
 
+        #Create a bid object 
+        bid= Bid(bid=float(price), user=currentUser)
+        bid.save()
+
+
         #Create a new listing object
         newListing = Listing(
             title=title,
             description=description,
             imageUrl=imageurl,
-            price=float(price),
+            price=bid,
             category=categoryData,
             owner=currentUser
             )
