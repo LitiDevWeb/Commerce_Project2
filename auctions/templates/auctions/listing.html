@@ -1,0 +1,56 @@
+{% extends "auctions/layout.html" %} {% block body %}
+<style>
+  .left-div {
+    float: left;
+    width: 50%;
+  }
+
+  .right-div {
+    float: right;
+    width: 50%;
+  }
+
+
+</style>
+
+<div class="row ">
+    {% if user.is_authenticated %}
+       {% if isListingInWatchlist %}
+       <form action="{% url 'removeWatchlist' id=listing.id %}" method="POST" >
+        {% csrf_token %}
+        <br>
+        <button type="submit" class="btn btn-danger">Remove From Watchlist</button>
+
+       </form>
+       {% else %}
+       <form action="{% url 'addWatchlist' id=listing.id %}" method="POST" >
+        {% csrf_token %}
+        <br>
+        <button type="submit" class="btn btn-success">Add From Watchlist</button>
+
+       </form>
+       {% endif %}
+       
+
+    {% endif %}
+    
+</div>
+
+<div class="left-div">
+  <h2>Device: {{ listing.title }}</h2>
+  <img
+    src="{{ listing.imageUrl }}"
+    alt="{{ listing.title }} "
+    width="700px"
+    height="650px"
+  />
+</div>
+
+<div class="right-div">
+  <h2>Description:</h2><br>
+    <h5  style="color: rgb(57, 57, 57);"> {{ listing.description }}</h5>
+  <p><h5><i>by {{listing.owner}}</i></h5></p>
+  <br>
+  <h2><b>{{ listing.price }} $</h2>
+</div>
+{% endblock %}
